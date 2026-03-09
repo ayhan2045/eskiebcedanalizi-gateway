@@ -29,6 +29,20 @@ server {
     proxy_pass https://finalebced.onrender.com/;
   }
 
+  location = /site.webmanifest {
+    auth_basic off;
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app;
+  }
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|map)$ {
+    auth_basic off;
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app;
+  }
+
   location / {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host ebced-chi.vercel.app;
