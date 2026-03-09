@@ -23,14 +23,12 @@ server {
 
   proxy_ssl_server_name on;
 
-  # API: AUTH AÇIK (korumalı)
   location /api/ {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host finalebced.onrender.com;
     proxy_pass https://finalebced.onrender.com/;
   }
 
-  # Statik dosyalar: AUTH KAPALI (tarayıcı bazen auth yollamıyor)
   location = /site.webmanifest {
     auth_basic off;
     proxy_set_header Accept-Encoding "";
@@ -45,7 +43,20 @@ server {
     proxy_pass https://ebced-chi.vercel.app;
   }
 
-  # Sayfalar: AUTH AÇIK (korumalı)
+  location ~* ^/login/(js|css|assets|favicons)/(.*)$ {
+    auth_basic off;
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/$1/$2;
+  }
+
+  location = /login/site.webmanifest {
+    auth_basic off;
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/site.webmanifest;
+  }
+
   location / {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host ebced-chi.vercel.app;
