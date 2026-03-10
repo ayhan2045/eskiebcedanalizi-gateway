@@ -22,12 +22,25 @@ server {
 
   location ^~ /__auth/ {
     proxy_set_header Host $host;
+    proxy_set_header Cookie $http_cookie;
     proxy_pass http://127.0.0.1:${AUTH_PORT};
   }
 
+  # API: ASLA login sayfasına redirect yapma. 401 ise 401 JSON dön.
   location /api/ {
+    # Preflight varsa auth isteme (tarayıcı bazen auth header/cookie göndermeden OPTIONS atar)
+    if ($request_method = OPTIONS) {
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+      add_header Access-Control-Max-Age 86400 always;
+      return 204;
+    }
+
     auth_request /__auth/check;
-    error_page 401 =302 /__auth/login?next=$request_uri;
+    error_page 401 = @api_unauthorized;
+
+    add_header Access-Control-Allow-Origin "*" always;
 
     proxy_set_header Accept-Encoding "";
     proxy_set_header Authorization "";
@@ -35,6 +48,12 @@ server {
 
     proxy_set_header Host finalebced.onrender.com;
     proxy_pass https://finalebced.onrender.com/;
+  }
+
+  location @api_unauthorized {
+    add_header Content-Type "application/json; charset=utf-8" always;
+    add_header Cache-Control "no-store" always;
+    return 401 '{"error":"gateway_unauthorized"}';
   }
 
   # KANITLI FIX: eski login HTML'in istediği yolları Vite assetlerine map et
