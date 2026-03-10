@@ -37,7 +37,26 @@ server {
     proxy_pass https://finalebced.onrender.com/;
   }
 
-  # KRİTİK: /login ve /login/... isteklerini Vercel ROOT'a yönlendir
+  # KANITLI FIX: eski login HTML'in istediği yolları Vite assetlerine map et
+  location = /js/main.js {
+    auth_request /__auth/check;
+    error_page 401 =302 /__auth/login?next=$request_uri;
+
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/assets/index-D7O-PDon.js;
+  }
+
+  location = /css/app.css {
+    auth_request /__auth/check;
+    error_page 401 =302 /__auth/login?next=$request_uri;
+
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/assets/index-Cmg2CXz_.css;
+  }
+
+  # /login her zaman root index'i versin (SPA)
   location = /login {
     auth_request /__auth/check;
     error_page 401 =302 /__auth/login?next=$request_uri;
