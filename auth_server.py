@@ -90,8 +90,8 @@ class Handler(BaseHTTPRequestHandler):
 
         if path == "/__auth/logout":
             headers = [
-                ("Set-Cookie", "gw_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"),
-                ("Set-Cookie", "gw_sig=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"),
+                ("Set-Cookie", "gw_token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax"),
+                ("Set-Cookie", "gw_sig=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax"),
                 ("Location", "/__auth/login"),
             ]
             self.send_response(302)
@@ -138,7 +138,9 @@ class Handler(BaseHTTPRequestHandler):
 
         token = "ok"
         sig = _sign(token)
-        cookie_common = "Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000"
+
+        cookie_common = "Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000"
+
         self.send_response(302)
         self.send_header("Set-Cookie", f"gw_token={token}; {cookie_common}")
         self.send_header("Set-Cookie", f"gw_sig={sig}; {cookie_common}")
