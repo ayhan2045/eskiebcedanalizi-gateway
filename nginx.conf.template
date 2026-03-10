@@ -26,33 +26,14 @@ server {
   location /api/ {
     proxy_set_header Accept-Encoding "";
 
-    # KRİTİK 1: Gateway BasicAuth header'ı backend'e gitmesin
+    # Gateway BasicAuth header'ı backend'e taşınmasın
     proxy_set_header Authorization "";
 
-    # Backend tarafı host'u doğru görsün
-    proxy_set_header Host finalebced.onrender.com;
-
-    # KRİTİK 2: Backend 401 dönse bile browser tekrar BasicAuth popup açmasın
+    # Backend'in 401 ile popup tetiklemesini engelle
     proxy_hide_header WWW-Authenticate;
 
-    # (Gerekirse cookie domain dönüşümü - zararsız, faydalı)
-    proxy_cookie_domain finalebced.onrender.com eskiebcedanalizi-gateway-pd68.onrender.com;
-
+    proxy_set_header Host finalebced.onrender.com;
     proxy_pass https://finalebced.onrender.com/;
-  }
-
-  location = /site.webmanifest {
-    auth_basic off;
-    proxy_set_header Accept-Encoding "";
-    proxy_set_header Host ebced-chi.vercel.app;
-    proxy_pass https://ebced-chi.vercel.app;
-  }
-
-  location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|map)$ {
-    auth_basic off;
-    proxy_set_header Accept-Encoding "";
-    proxy_set_header Host ebced-chi.vercel.app;
-    proxy_pass https://ebced-chi.vercel.app;
   }
 
   location = /login {
