@@ -7,10 +7,15 @@ server {
   sub_filter_once off;
   sub_filter_types text/html text/css application/javascript application/json;
 
-  sub_filter "http://localhost:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
-  sub_filter "https://localhost:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
-  sub_filter "http://127.0.0.1:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
-  sub_filter "https://127.0.0.1:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
+  # UI içindeki backend URL'lerini custom domain üzerinden same-origin /api'ye çevir
+  sub_filter "http://localhost:8000" "/api";
+  sub_filter "https://localhost:8000" "/api";
+  sub_filter "http://127.0.0.1:8000" "/api";
+  sub_filter "https://127.0.0.1:8000" "/api";
+
+  # UI içinde hardcode kalmış eski gateway URL'lerini de /api'ye indir
+  sub_filter "https://eskiebcedanalizi-gateway-pd68.onrender.com/api" "/api";
+  sub_filter "http://eskiebcedanalizi-gateway-pd68.onrender.com/api" "/api";
 
   proxy_http_version 1.1;
   proxy_set_header Connection "";
@@ -30,7 +35,7 @@ server {
     if ($request_method = OPTIONS) {
       add_header Access-Control-Allow-Origin "*" always;
       add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
-      add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+      add_header Access-Control-Allow-Headers "Authorization, Content-Type, x-device-fingerprint" always;
       add_header Access-Control-Max-Age 86400 always;
       return 204;
     }
@@ -48,8 +53,8 @@ server {
     # Backend 401 dönse bile browser popup olmasın
     proxy_hide_header WWW-Authenticate;
 
-    # Backend cookie set ederse gateway domainine yazılsın (oturum/cookie bazlı auth varsa)
-    proxy_cookie_domain finalebced.onrender.com eskiebcedanalizi-gateway-pd68.onrender.com;
+    # Backend cookie set ederse custom domain'e yazılsın
+    proxy_cookie_domain finalebced.onrender.com eskiebcedanalizi.ebcedanalizi.com;
 
     proxy_set_header Host finalebced.onrender.com;
     proxy_pass https://finalebced.onrender.com/;
