@@ -43,25 +43,18 @@ server {
     proxy_pass https://ebced-chi.vercel.app;
   }
 
-  location ~* ^/login/(js|css|assets|favicons)/(.*)$ {
-    auth_basic off;
+  # KRİTİK: /login'ı Vercel'in ana SPA girişine yönlendir.
+  # Böylece Vite'ın /assets/* dosyaları yüklenir, /js/main.js gibi eski yollar kullanılmaz.
+  location = /login {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host ebced-chi.vercel.app;
-    proxy_pass https://ebced-chi.vercel.app/$1/$2;
+    proxy_pass https://ebced-chi.vercel.app/;
   }
 
-  location ~* ^/login/(.*\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|map))$ {
-    auth_basic off;
+  location ^~ /login/ {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host ebced-chi.vercel.app;
-    proxy_pass https://ebced-chi.vercel.app/$1;
-  }
-
-  location = /login/site.webmanifest {
-    auth_basic off;
-    proxy_set_header Accept-Encoding "";
-    proxy_set_header Host ebced-chi.vercel.app;
-    proxy_pass https://ebced-chi.vercel.app/site.webmanifest;
+    proxy_pass https://ebced-chi.vercel.app/;
   }
 
   location / {
