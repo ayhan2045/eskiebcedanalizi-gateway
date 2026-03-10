@@ -27,10 +27,16 @@ server {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host finalebced.onrender.com;
 
-    # KRİTİK: Backend 401 döndüğünde tarayıcı BasicAuth popup açmasın diye
-    proxy_hide_header WWW-Authenticate;
+    # Backend 401 dönünce browser BasicAuth popup açmasın diye:
+    proxy_intercept_errors on;
+    error_page 401 = @api_unauthorized;
 
     proxy_pass https://finalebced.onrender.com/;
+  }
+
+  location @api_unauthorized {
+    # 401 yerine 403 dönüyoruz -> popup tetiklenmez
+    return 403;
   }
 
   location = /site.webmanifest {
