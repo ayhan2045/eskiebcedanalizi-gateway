@@ -25,15 +25,6 @@ server {
     proxy_pass http://127.0.0.1:${AUTH_PORT};
   }
 
-  location / {
-    auth_request /__auth/check;
-    error_page 401 =302 /__auth/login?next=$request_uri;
-
-    proxy_set_header Accept-Encoding "";
-    proxy_set_header Host ebced-chi.vercel.app;
-    proxy_pass https://ebced-chi.vercel.app;
-  }
-
   location /api/ {
     auth_request /__auth/check;
     error_page 401 =302 /__auth/login?next=$request_uri;
@@ -44,5 +35,33 @@ server {
 
     proxy_set_header Host finalebced.onrender.com;
     proxy_pass https://finalebced.onrender.com/;
+  }
+
+  # KRİTİK: /login ve /login/... isteklerini Vercel ROOT'a yönlendir
+  location = /login {
+    auth_request /__auth/check;
+    error_page 401 =302 /__auth/login?next=$request_uri;
+
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/;
+  }
+
+  location ^~ /login/ {
+    auth_request /__auth/check;
+    error_page 401 =302 /__auth/login?next=$request_uri;
+
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/;
+  }
+
+  location / {
+    auth_request /__auth/check;
+    error_page 401 =302 /__auth/login?next=$request_uri;
+
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app;
   }
 }
