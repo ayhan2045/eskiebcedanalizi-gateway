@@ -26,9 +26,7 @@ server {
     proxy_pass http://127.0.0.1:${AUTH_PORT};
   }
 
-  # API: ASLA login sayfasına redirect yapma. 401 ise 401 JSON dön.
   location /api/ {
-    # Preflight varsa auth isteme (tarayıcı bazen auth header/cookie göndermeden OPTIONS atar)
     if ($request_method = OPTIONS) {
       add_header Access-Control-Allow-Origin "*" always;
       add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" always;
@@ -43,8 +41,15 @@ server {
     add_header Access-Control-Allow-Origin "*" always;
 
     proxy_set_header Accept-Encoding "";
-    proxy_set_header Authorization "";
+
+    # KRİTİK: Uygulamanın Bearer token'ı aynen backend'e gitsin
+    proxy_set_header Authorization $http_authorization;
+
+    # Backend 401 dönse bile browser popup olmasın
     proxy_hide_header WWW-Authenticate;
+
+    # Backend cookie set ederse gateway domainine yazılsın (oturum/cookie bazlı auth varsa)
+    proxy_cookie_domain finalebced.onrender.com eskiebcedanalizi-gateway-pd68.onrender.com;
 
     proxy_set_header Host finalebced.onrender.com;
     proxy_pass https://finalebced.onrender.com/;
@@ -56,7 +61,6 @@ server {
     return 401 '{"error":"gateway_unauthorized"}';
   }
 
-  # KANITLI FIX: eski login HTML'in istediği yolları Vite assetlerine map et
   location = /js/main.js {
     auth_request /__auth/check;
     error_page 401 =302 /__auth/login?next=$request_uri;
@@ -75,7 +79,6 @@ server {
     proxy_pass https://ebced-chi.vercel.app/assets/index-Cmg2CXz_.css;
   }
 
-  # /login her zaman root index'i versin (SPA)
   location = /login {
     auth_request /__auth/check;
     error_page 401 =302 /__auth/login?next=$request_uri;
