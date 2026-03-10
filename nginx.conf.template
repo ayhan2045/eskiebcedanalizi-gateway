@@ -25,18 +25,20 @@ server {
 
   location /api/ {
     proxy_set_header Accept-Encoding "";
+
+    # KRİTİK 1: Gateway BasicAuth header'ı backend'e gitmesin
+    proxy_set_header Authorization "";
+
+    # Backend tarafı host'u doğru görsün
     proxy_set_header Host finalebced.onrender.com;
 
-    # Backend 401 dönünce browser BasicAuth popup açmasın diye:
-    proxy_intercept_errors on;
-    error_page 401 = @api_unauthorized;
+    # KRİTİK 2: Backend 401 dönse bile browser tekrar BasicAuth popup açmasın
+    proxy_hide_header WWW-Authenticate;
+
+    # (Gerekirse cookie domain dönüşümü - zararsız, faydalı)
+    proxy_cookie_domain finalebced.onrender.com eskiebcedanalizi-gateway-pd68.onrender.com;
 
     proxy_pass https://finalebced.onrender.com/;
-  }
-
-  location @api_unauthorized {
-    # 401 yerine 403 dönüyoruz -> popup tetiklenmez
-    return 403;
   }
 
   location = /site.webmanifest {
