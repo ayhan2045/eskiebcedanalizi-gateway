@@ -26,6 +26,10 @@ server {
   location /api/ {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host finalebced.onrender.com;
+
+    # KRİTİK: Backend 401 döndüğünde tarayıcı BasicAuth popup açmasın diye
+    proxy_hide_header WWW-Authenticate;
+
     proxy_pass https://finalebced.onrender.com/;
   }
 
@@ -43,8 +47,6 @@ server {
     proxy_pass https://ebced-chi.vercel.app;
   }
 
-  # KRİTİK: /login'ı Vercel'in ana SPA girişine yönlendir.
-  # Böylece Vite'ın /assets/* dosyaları yüklenir, /js/main.js gibi eski yollar kullanılmaz.
   location = /login {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host ebced-chi.vercel.app;
