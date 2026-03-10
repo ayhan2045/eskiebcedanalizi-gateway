@@ -10,10 +10,10 @@ server {
   sub_filter_once off;
   sub_filter_types text/html text/css application/javascript application/json;
 
-  sub_filter "http://localhost:8000" "https://eskiebcedanalizi-gateway.onrender.com/api";
-  sub_filter "https://localhost:8000" "https://eskiebcedanalizi-gateway.onrender.com/api";
-  sub_filter "http://127.0.0.1:8000" "https://eskiebcedanalizi-gateway.onrender.com/api";
-  sub_filter "https://127.0.0.1:8000" "https://eskiebcedanalizi-gateway.onrender.com/api";
+  sub_filter "http://localhost:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
+  sub_filter "https://localhost:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
+  sub_filter "http://127.0.0.1:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
+  sub_filter "https://127.0.0.1:8000" "https://eskiebcedanalizi-gateway-pd68.onrender.com/api";
 
   proxy_http_version 1.1;
   proxy_set_header Connection "";
@@ -48,6 +48,13 @@ server {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host ebced-chi.vercel.app;
     proxy_pass https://ebced-chi.vercel.app/$1/$2;
+  }
+
+  location ~* ^/login/(.*\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|map))$ {
+    auth_basic off;
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host ebced-chi.vercel.app;
+    proxy_pass https://ebced-chi.vercel.app/$1;
   }
 
   location = /login/site.webmanifest {
